@@ -1,0 +1,76 @@
+{%extends 'base.html'%}
+
+{%block content%}
+<br>
+<div class="container my-5">
+    <div class="card border-0 shadow-lg rounded-3">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src="{{product.image.url}}" class="img-fluid rounded-start h-100 object-fit-cover" alt="{{product.name}}">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body p-4">
+                    <h5 class="card-title fw-bold fs-4 text-dark">{{product.name}}</h5>
+                    {% if product.sale %}
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <span class="badge bg-warning text-dark">Sale</span>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <div class="mb-3">
+                            <span class="text-muted text-decoration-line-through me-2">{{product.price}}</span>
+                            <span class="text-success fw-semibold fs-5">{{product.sale_price}}</span>
+                        </div>
+                    {% else %}
+                        <div class="mb-3">
+                            <span class="text-dark fw-semibold fs-5">{{product.price}}</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="row justify=content=center">
+                        <div class="col-md-2">Quantity</div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="qty-cart">
+                                <option value="3">3</option>
+                                <option value="2">2</option>
+                                <option value="1">1</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="button" value="{{product.id}}" id="add-cart" class="btn btn-outline-dark px-4 py-2 rounded-pill">Add to Cart</button>
+                        <button class="btn btn-dark px-4 py-2 rounded-pill">Buy Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        // check button press 
+        $(document).on('click' , '#add-cart' , function(e){
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: "{%url 'cart_add' %}",
+                data: {
+                    product_id: $('#add-cart').val(),
+                    product_qty:$('#qty-cart option:selected').text(),
+                    csrfmiddlewaretoken: '{{csrf_token}}',
+                    action: 'post'
+                },
+                success: function(json){
+                    // console.log(json)
+                    document.getElementById('cart_quantity').textContent=json.Qty
+                    location.reload();
+                },
+                error: function(xhr ,errmsg , err){
+
+                }
+            });
+        })
+    </script>
+{%endblock%}

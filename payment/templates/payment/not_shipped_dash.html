@@ -1,0 +1,38 @@
+{%extends 'base.html'%}
+
+{%block content%}
+
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-8"> 
+            <h2 class="text-center mt-4">UnShipped Orders Items</h2>
+            <table class="table table-striped mt-4 table-hover table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        
+                        <th scope="col">Order</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Customers E-mail</th>
+                        <th scope="col">Date Ordered</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {% for items in orders%}
+                    <tr>
+                        
+                        <td> <a href="{% url 'orders' items.id %}">{{ items.id }}</a> </td>
+                        <td>  {{ items.amount_paid}}</td>
+                        <td>  {{ items.email}}</td>
+                        <td>  {{items.date_ordered}}</td>
+                    </tr>
+                    {% endfor %}
+                
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+{%endblock%}

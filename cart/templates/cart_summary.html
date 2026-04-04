@@ -1,0 +1,133 @@
+{% extends 'base.html'%}
+{%block content%}
+    <!-- Header-->
+    <header class="bg-dark py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">Shoping Cart</h1>
+                <p class="lead fw-normal text-white-50 mb-0">Checkout your carts</p>
+            </div>
+        </div>
+    </header>
+    <br>
+    <div class="container">
+        {%if cart_products%}
+            {%for product in cart_products %}
+                <div class="container my-5">
+                    <div class="card border-0 shadow-lg rounded-3">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="{{product.image.url}}" class="img-fluid rounded-start h-100 object-fit-cover" alt="{{product.name}}">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body p-4">
+                                    <h5 class="card-title fw-bold fs-4 text-dark">{{product.name}}</h5>
+                                    {% if product.sale %}
+                                        <div class="d-flex align-items-center gap-2 mb-3">
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                            <span class="badge bg-warning text-dark">Sale</span>
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        </div>
+                                        <div class="mb-3">
+                                            <span class="text-muted text-decoration-line-through me-2">{{product.price}}</span>
+                                            <span class="text-success fw-semibold fs-5">{{product.sale_price}}</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="mb-3">
+                                            <span class="text-dark fw-semibold fs-5">{{product.price}}</span>
+                                        </div>
+                                    {% endif %}
+                                    <div class="row justify=content=center">
+                                        <div class="col-md-2">Quantity</div>
+                                        <div class="col-md-2">
+                                            <select class="form-select" id="select{{product.id}}">
+                                                
+                                                    {%for key, value in quantities.items%}
+                                                        {%if key == product.id|slugify%}
+                                                            <option selected>{{value}}</option>
+                                                        {%endif%}
+                                                    {%endfor%}  
+                                                <option value="3">3</option>
+                                                <option value="2">2</option>
+                                                <option value="1">1</option>
+                                            </select>
+                                        </div>
+                                    </div><br><br>
+                                                 <p>Total : {{total}}</p>
+                                    <div class="d-flex gap-3 mt-4">
+                                        <button type="button" data-index="{{product.id}}" class="btn btn-outline-dark px-4 py-2 rounded-pill update-cart">Update</button>
+                                        <button type="button" data-index="{{product.id}}" class="btn btn-danger px-4 py-2 rounded-pill delete-product">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {%endfor%} <br><br><br><br>
+            <div align="right">
+                <h1>Grand Total: Rs {{ totals }}</h1> <br>
+                <a href="{%url 'checkout'%}" class="btn btn-success">Checkout</a> <br><br><br><br>
+            </div>
+
+        {%else%}
+                <div class="container min-vh-75" style="height: 70vh;">
+                    <h1>There is Nothing in Your Store</h1>
+                    <h1>Lets Add Products To Your Carts</h1>
+                    
+                </div>
+                
+        {%endif%}
+    </div>
+    <script>
+        // cart update 
+        $(document).on('click' , '.update-cart' , function(e){
+            e.preventDefault();
+            // grab the product 
+
+            var productid = $(this).data('index');
+            $.ajax({
+                type: 'POST',
+                url: "{%url 'cart_update' %}",
+                data: {
+                    product_id: $(this).data('index'),
+                    product_qty:$('#select' + productid + ' option:selected').val(),
+                    csrfmiddlewaretoken: '{{csrf_token}}',
+                    action: 'post'
+                },
+                success: function(json){
+                    // console.log(json)
+                    // document.getElementById('cart_quantity').textContent=json.Qty
+                    location.reload();
+                },
+                error: function(xhr ,errmsg , err){
+
+                }
+            });
+        })
+
+
+        // delete from cart 
+        $(document).on('click' , '.delete-product' , function(e){
+            e.preventDefault();
+
+            $.ajax({
+                type: 'POST',
+                url: "{%url 'cart_delete' %}",
+                data: {
+                    product_id: $(this).data('index'),
+
+                    csrfmiddlewaretoken: '{{csrf_token}}',
+                    action: 'post'
+                },
+                success: function(json){
+                    // console.log(json)
+                    // document.getElementById('cart_quantity').textContent=json.Qty
+                    location.reload();
+                },
+                error: function(xhr ,errmsg , err){
+
+                }
+            });
+        })
+    </script>
+{%endblock%}
